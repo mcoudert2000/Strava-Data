@@ -12,6 +12,8 @@ library(shiny)
 library(httr)
 library(jsonlite)
 library(tidyverse)
+library(lubridate)
+
 
 # Creating endpoint to use in oath2.0_token
 my_endpoint <- oauth_endpoint(
@@ -29,13 +31,29 @@ my_token = oauth2.0_token(
     use_oob = FALSE
 )
 
+# Fetching my data from the API
+athl_res = GET("https://www.strava.com/api/v3/athlete/activities",
+               query = list(page = 1, per_page = 200), my_token)
+# Converting raw data into usable format
+activity_data <- fromJSON(rawToChar(athl_res$content)) 
+#tidying
+activity_data <- activity_data %>%
+    select(-c("pr_count", "commute", "from_accepted_tag","athlete_count",
+              "resource_state", "comment_count", "photo_count", "has_kudoed",
+              "photo_count", "visibility","private","external_id","upload_id",
+              "utc_offset","achievement_count","timezone",
+              "location_city","location_state","location_country","flagged",
+              "private","upload_id_str","manual","gear_id","heartrate_opt_out",
+              "display_hide_heartrate_option"))
+
+
+
 #UI 
 ui <- fluidPage(
 )
 
 #SERVER
 server <- function(input, output) {
-
 }
 
 # Run the application 
